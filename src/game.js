@@ -23,7 +23,10 @@ class MainScene extends Phaser.Scene {
     }
 
     preload() {
-        // No external assets for MVP; we'll use graphics to generate textures.
+        this.load.audio('playerDamage', 'assets/playerDamage.wav');
+        this.load.audio('playerDeath', 'assets/playerDeath.wav');
+        this.load.audio('enemyDestroyed', 'assets/enemyDestroyed.wav');
+        this.load.audio('pickupCoin', 'assets/pickupCoin.wav');
     }
 
     create() {
@@ -220,6 +223,7 @@ class MainScene extends Phaser.Scene {
         coin.destroy();
         this.coinCount += 1;
         this.coinText.setText('Coins: ' + this.coinCount);
+        this.sound.play('pickupCoin');
     }
 
     hitEnemy(bullet, enemy) {
@@ -233,11 +237,16 @@ class MainScene extends Phaser.Scene {
 
         this.score += 10;
         this.scoreText.setText('Score: ' + this.score);
+
+        this.sound.play('enemyDestroyed');
     }
 
     hitPlayer(player, enemy) {
         this.explosionEmitter.explode(15, enemy.x, enemy.y);
         enemy.destroy();
+
+        // Play damage sound
+        this.sound.play('playerDamage');
 
         // Screen effects: Flash and Shake
         this.cameras.main.flash(200, 255, 0, 0); // Red flash
@@ -250,6 +259,7 @@ class MainScene extends Phaser.Scene {
             this.physics.pause();
             this.player.setTint(0xff0000);
             this.add.text(400, 300, 'GAME OVER', { fontSize: '64px', fill: '#fff' }).setOrigin(0.5);
+            this.sound.play('playerDeath');
         }
     }
 }
