@@ -47,12 +47,16 @@ class MainScene extends Phaser.Scene {
         this.load.audio('enemyDestroyed', 'assets/enemyDestroyed.wav');
         this.load.audio('pickupCoin', 'assets/pickupCoin.wav');
         this.load.audio('thrusterRumble', 'assets/thrusterRumble.wav');
+        this.load.audio('backgroundMusic', 'assets/Nebula_Stalker.mp3');
     }
 
     create() {
         // Create textures for bullet, coin, thrusters (player & enemy ship are PNGs)
         this.createTextures();
         this.setupStarfield();
+
+        // Background music
+        this.sound.play('backgroundMusic', { loop: true, volume: 0.5 });
 
         // Infinite arena: large physics bounds, no edge collision; camera follows the player.
         this.physics.world.setBounds(-2e6, -2e6, 4e6, 4e6);
@@ -87,9 +91,9 @@ class MainScene extends Phaser.Scene {
 
         // Control Panel Background
         this.panelGraphics = this.add.graphics().setScrollFactor(0);
-        this.panelGraphics.fillStyle(0x000000, 0.7);
+        this.panelGraphics.fillStyle(0x000000, 1.0);
         this.panelGraphics.fillRect(0, 500, 800, 150);
-        this.panelGraphics.setDepth(-1);
+        this.panelGraphics.setDepth(5);
 
         // Radar
         this.radarGraphics = this.add.graphics().setScrollFactor(0);
@@ -544,9 +548,9 @@ class MainScene extends Phaser.Scene {
 
         // Handle Rotation
         if (this.cursors.left.isDown || this.wasd.A.isDown) {
-            this.player.setAngularVelocity(-150);
+            this.player.setAngularVelocity(-220);
         } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
-            this.player.setAngularVelocity(150);
+            this.player.setAngularVelocity(220);
         } else {
             this.player.setAngularVelocity(0);
         }
