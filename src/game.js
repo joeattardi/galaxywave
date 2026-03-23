@@ -23,6 +23,8 @@ class MainScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('player', 'assets/playerShip.png');
+        this.load.image('enemy', 'assets/enemyShip.png');
         this.load.audio('playerDamage', 'assets/playerDamage.wav');
         this.load.audio('playerDeath', 'assets/playerDeath.wav');
         this.load.audio('enemyDestroyed', 'assets/enemyDestroyed.wav');
@@ -31,7 +33,7 @@ class MainScene extends Phaser.Scene {
     }
 
     create() {
-        // Create textures for player, bullet, and enemy
+        // Create textures for bullet, coin, thrusters (player & enemy ship are PNGs)
         this.createTextures();
 
         // Setup Player
@@ -128,17 +130,7 @@ class MainScene extends Phaser.Scene {
     }
 
     createTextures() {
-        // Player: Green Triangle (pointing Right)
         let graphics = this.make.graphics({ x: 0, y: 0, add: false });
-        graphics.fillStyle(0x00ff00, 1);
-        graphics.fillTriangle(0, 0, 0, 32, 32, 16);
-        graphics.generateTexture('player', 32, 32);
-
-        // Enemy: Red Square
-        graphics.clear();
-        graphics.fillStyle(0xff0000, 1);
-        graphics.fillRect(0, 0, 24, 24);
-        graphics.generateTexture('enemy', 24, 24);
 
         // Bullet: White Circle
         graphics.clear();
