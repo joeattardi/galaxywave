@@ -53,6 +53,7 @@ class MainScene extends Phaser.Scene {
         // Input
         this.cursors = this.input.keyboard.createCursorKeys();
         this.wasd = this.input.keyboard.addKeys('W,A,S,D');
+        this.qeKeys = this.input.keyboard.addKeys('Q,E');
 
         // UI
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '24px', fill: '#fff' });
@@ -68,6 +69,34 @@ class MainScene extends Phaser.Scene {
             gravityY: 0,
             emitting: false
         });
+
+        this.thrusterHaloEmitter = this.add.particles(0, 0, 'thrusterHalo', {
+            lifespan: { min: 220, max: 380 },
+            speed: { min: 35, max: 85 },
+            scale: { start: 1.45, end: 0 },
+            alpha: { start: 0.4, end: 0 },
+            tint: [0xaa77ff, 0x55aaff, 0xff66cc, 0x66eeff],
+            blendMode: 'ADD',
+            frequency: 11,
+            quantity: 3,
+            gravityY: 0,
+            emitting: false
+        });
+        this.thrusterHaloEmitter.setDepth(-2);
+
+        this.thrusterEmitter = this.add.particles(0, 0, 'thruster', {
+            lifespan: { min: 130, max: 240 },
+            speed: { min: 100, max: 260 },
+            scale: { start: 0.78, end: 0 },
+            alpha: { start: 1, end: 0 },
+            tint: [0xffffff, 0xccffff, 0xffee88, 0xff9944, 0xff5522],
+            blendMode: 'ADD',
+            frequency: 7,
+            quantity: 4,
+            gravityY: 0,
+            emitting: false
+        });
+        this.thrusterEmitter.setDepth(-1);
 
         // Timers
         this.time.addEvent({
@@ -107,6 +136,24 @@ class MainScene extends Phaser.Scene {
         graphics.fillStyle(0xffff00, 1);
         graphics.fillCircle(4, 4, 4);
         graphics.generateTexture('coin', 8, 8);
+
+        // Thruster: layered flare (bright core + soft falloff)
+        graphics.clear();
+        graphics.fillStyle(0xffffff, 0.22);
+        graphics.fillCircle(10, 10, 10);
+        graphics.fillStyle(0xffffff, 0.5);
+        graphics.fillCircle(10, 10, 6);
+        graphics.fillStyle(0xffffff, 1);
+        graphics.fillCircle(10, 10, 3);
+        graphics.generateTexture('thruster', 20, 20);
+
+        // Wide soft blob for outer ion plume
+        graphics.clear();
+        graphics.fillStyle(0xaaccff, 0.2);
+        graphics.fillCircle(14, 14, 14);
+        graphics.fillStyle(0xffffff, 0.35);
+        graphics.fillCircle(14, 14, 8);
+        graphics.generateTexture('thrusterHalo', 28, 28);
     }
 
     update(time) {
@@ -157,7 +204,7 @@ class MainScene extends Phaser.Scene {
 
     handlePlayerMovement() {
         const thrust = 300;
-        const rotationSpeed = 3; // Radians per second
+        const r = this.player.rotation;
 
         // Handle Rotation
         if (this.cursors.left.isDown || this.wasd.A.isDown) {
@@ -168,14 +215,54 @@ class MainScene extends Phaser.Scene {
             this.player.setAngularVelocity(0);
         }
 
-        // Handle Thrust
+        let ax = 0;
+        let ay = 0;
+
         if (this.cursors.up.isDown || this.wasd.W.isDown) {
-            this.physics.velocityFromRotation(this.player.rotation, thrust, this.player.body.acceleration);
+            ax += Math.cos(r) * thrust;
+            ay += Math.sin(r) * thrust;
         } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
-            this.physics.velocityFromRotation(this.player.rotation, -thrust, this.player.body.acceleration);
-        } else {
-            this.player.setAcceleration(0);
+            ax -= Math.cos(r) * thrust;
+            ay -= Math.sin(r) * thrust;
         }
+
+        if (this.qeKeys.Q.isDown) {
+            ax += Math.cos(r - Math.PI / 2) * thrust;
+            ay += Math.sin(r - Math.PI / 2) * thrust;
+        }
+        if (this.qeKeys.E.isDown) {
+            ax += Math.cos(r + Math.PI / 2) * thrust;
+            ay += Math.sin(r + Math.PI / 2) * thrust;
+        }
+
+        this.player.setAcceleration(ax, ay);
+        this.updateThrusterVisual(ax, ay);
+    }
+
+    updateThrusterVisual(ax, ay) {
+        const magSq = ax * ax + ay * ay;
+        if (magSq < 1) {
+            this.thrusterEmitter.emitting = false;
+            this.thrusterHaloEmitter.emitting = false;
+            return;
+        }
+
+        const mag = Math.sqrt(magSq);
+        const nx = ax / mag;
+        const ny = ay / mag;
+        const offset = 14;
+        const px = this.player.x - nx * offset;
+        const py = this.player.y - ny * offset;
+
+        const deg = Phaser.Math.RadToDeg(Math.atan2(-ay, -ax));
+
+        this.thrusterHaloEmitter.setPosition(px, py);
+        this.thrusterHaloEmitter.ops.angle.loadConfig({ angle: { min: deg - 38, max: deg + 38 } });
+        this.thrusterHaloEmitter.emitting = true;
+
+        this.thrusterEmitter.setPosition(px, py);
+        this.thrusterEmitter.ops.angle.loadConfig({ angle: { min: deg - 26, max: deg + 26 } });
+        this.thrusterEmitter.emitting = true;
     }
 
     fireBullet() {
@@ -256,6 +343,8 @@ class MainScene extends Phaser.Scene {
         this.healthText.setText('Health: ' + this.health);
 
         if (this.health <= 0) {
+            this.thrusterEmitter.emitting = false;
+            this.thrusterHaloEmitter.emitting = false;
             this.physics.pause();
             this.player.setTint(0xff0000);
             this.player.setVisible(false);
