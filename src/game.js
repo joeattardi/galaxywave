@@ -30,6 +30,7 @@ class MainScene extends Phaser.Scene {
         this.bulletMaxDistance = 1600;
         /** True speed cap (px/s); Arcade maxVelocity is per-axis, so we clamp vector length here. */
         this.playerMaxSpeed = 220;
+        this.enemyMaxSpeed = 220; // Enemies are faster than player for increased difficulty
         // Radar properties
         this.radarRange = 2500; // World units to detect
         this.radarRadius = 80; // Screen pixels for radar display
@@ -375,7 +376,7 @@ class MainScene extends Phaser.Scene {
 
         // Enemy Movement (Follow player)
         this.enemies.getChildren().forEach(enemy => {
-            this.physics.moveToObject(enemy, this.player, 100);
+            this.physics.moveToObject(enemy, this.player, this.enemyMaxSpeed);
         });
 
         this.cullDistantEnemies();
