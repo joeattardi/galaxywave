@@ -30,7 +30,7 @@ class MainScene extends Phaser.Scene {
         this.bulletMaxDistance = 1600;
         /** True speed cap (px/s); Arcade maxVelocity is per-axis, so we clamp vector length here. */
         this.playerMaxSpeed = 220;
-        this.enemyMaxSpeed = 220; // Enemies are faster than player for increased difficulty
+        this.enemyMaxSpeed = 200; // Enemies are faster than player for increased difficulty
         // Radar properties
         this.radarRange = 2500; // World units to detect
         this.radarRadius = 40; // Screen pixels for radar display
@@ -85,9 +85,9 @@ class MainScene extends Phaser.Scene {
         this.qeKeys = this.input.keyboard.addKeys('Q,E');
 
         // UI (fixed to viewport while the world scrolls)
-        this.scoreText = this.add.text(16, 520, 'Score: 0', { fontSize: '24px', fill: '#fff' }).setScrollFactor(0);
-        this.healthText = this.add.text(16, 540, 'Health: 100', { fontSize: '24px', fill: '#fff' }).setScrollFactor(0);
-        this.coinText = this.add.text(16, 560, 'Coins: 0', { fontSize: '24px', fill: '#fff' }).setScrollFactor(0);
+        this.scoreText = this.add.text(16, 520, 'Score: 0', { fontSize: '24px', fill: '#fff' }).setScrollFactor(0).setDepth(6);
+        this.healthText = this.add.text(16, 540, 'Health: 100', { fontSize: '24px', fill: '#fff' }).setScrollFactor(0).setDepth(6);
+        this.coinText = this.add.text(16, 560, 'Coins: 0', { fontSize: '24px', fill: '#fff' }).setScrollFactor(0).setDepth(6);
 
         // Control Panel Background
         this.panelGraphics = this.add.graphics().setScrollFactor(0);
