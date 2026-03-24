@@ -90,9 +90,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   ): void {
     const thrust = 300;
 
-    if (cursors.left.isDown || keys.A.isDown) {
+    const isRotatingLeft = cursors.left.isDown || keys.A.isDown;
+    const isRotatingRight = cursors.right.isDown || keys.D.isDown;
+
+    if (isRotatingLeft && isRotatingRight) {
+      this.setAngularVelocity(0);
+    } else if (isRotatingLeft) {
       this.setAngularVelocity(-220);
-    } else if (cursors.right.isDown || keys.D.isDown) {
+    } else if (isRotatingRight) {
       this.setAngularVelocity(220);
     } else {
       this.setAngularVelocity(0);
@@ -122,8 +127,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.updateThrusterVisual(acceleration);
     this.updateThrusterSound(acceleration);
 
-    const isRotatingLeft = cursors.left.isDown || keys.A.isDown;
-    const isRotatingRight = cursors.right.isDown || keys.D.isDown;
     this.updateRcsVisual(isRotatingLeft, isRotatingRight);
   }
 
@@ -173,8 +176,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.rcsStarboardEmitter.ops.angle as { loadConfig(cfg: object): void }
       ).loadConfig({ angle: { min: deg - 22, max: deg + 22 } });
       this.rcsStarboardEmitter.emitting = true;
-      this.rcsPortEmitter.emitting = false;
-    } else if (isRotatingRight) {
+    } else {
+      this.rcsStarboardEmitter.emitting = false;
+    }
+
+    if (isRotatingRight) {
       const sx = Math.sin(r);
       const sy = -Math.cos(r);
       const deg = Phaser.Math.RadToDeg(Math.atan2(sy, sx));
@@ -183,10 +189,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.rcsPortEmitter.ops.angle as { loadConfig(cfg: object): void }
       ).loadConfig({ angle: { min: deg - 22, max: deg + 22 } });
       this.rcsPortEmitter.emitting = true;
-      this.rcsStarboardEmitter.emitting = false;
     } else {
       this.rcsPortEmitter.emitting = false;
-      this.rcsStarboardEmitter.emitting = false;
     }
   }
 
