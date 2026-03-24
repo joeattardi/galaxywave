@@ -7,7 +7,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 650,
-        title: 'Void Wake',
+        title: 'Gamma Vector',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
