@@ -32,7 +32,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             volume: 2
         });
 
-        this.health = 1000;
+        this.health = 100;
     }
 
     update(
