@@ -44,18 +44,8 @@ export class Radar {
         this.graphics.strokeCircle(this.x, this.y, this.radius * 0.25);
 
         this.graphics.lineStyle(1, 0x666666, 0.3);
-        this.graphics.lineBetween(
-            this.x - this.radius,
-            this.y,
-            this.x + this.radius,
-            this.y
-        );
-        this.graphics.lineBetween(
-            this.x,
-            this.y - this.radius,
-            this.x,
-            this.y + this.radius
-        );
+        this.graphics.lineBetween(this.x - this.radius, this.y, this.x + this.radius, this.y);
+        this.graphics.lineBetween(this.x, this.y - this.radius, this.x, this.y + this.radius);
 
         const scale = this.radius / this.range;
 
