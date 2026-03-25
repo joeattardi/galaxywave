@@ -7,7 +7,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 650,
-        title: 'Gamma Vector',
+        title: 'Galaxy Wave',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true

@@ -15,7 +15,7 @@ export default function MainMenu({ onStartGame }: MainMenuProps) {
     return (
         <div className="main-menu">
             <div className="menu-content">
-                <h1 className="menu-title">GAMMA VECTOR</h1>
+                <h1 className="menu-title">GALAXY WAVE</h1>
                 <p className="menu-subtitle">A space survival shooter</p>
                 <button ref={buttonRef} className="menu-button" onClick={onStartGame}>
                     Start Game
