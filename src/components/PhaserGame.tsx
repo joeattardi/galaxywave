@@ -7,6 +7,7 @@ export default function PhaserGame() {
     const containerRef = useRef<HTMLDivElement>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
     const [showGameOver, setShowGameOver] = useState(false);
+    const [paused, setPaused] = useState(false);
     const [score, setScore] = useState(0);
     const [health, setHealth] = useState(100);
     const [coins, setCoins] = useState(0);
@@ -19,13 +20,25 @@ export default function PhaserGame() {
         gameRef.current = game;
 
         game.events.on('game-over', () => {
+            setPaused(false);
             setShowGameOver(true);
         });
         game.events.on('score-changed', (value: number) => setScore(value));
         game.events.on('health-changed', (value: number) => setHealth(value));
         game.events.on('coin-collected', (value: number) => setCoins(value));
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key !== 'Escape') return;
+            const scene = game.scene.getScene('MainScene');
+            if (!scene || (!scene.scene.isActive() && !scene.scene.isPaused())) return;
+            const isPaused = scene.scene.isPaused();
+            setPaused(!isPaused);
+            game.events.emit('pause-toggled', !isPaused);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+
         return () => {
+            window.removeEventListener('keydown', handleKeyDown);
             if (gameRef.current) {
                 gameRef.current.destroy(true);
                 gameRef.current = null;
@@ -37,6 +50,7 @@ export default function PhaserGame() {
         const game = gameRef.current;
         if (!game) return;
         setShowGameOver(false);
+        setPaused(false);
         setScore(0);
         setHealth(100);
         setCoins(0);
@@ -50,6 +64,31 @@ export default function PhaserGame() {
     return (
         <div id="game-wrapper">
             <div ref={containerRef} id="game-container">
+                {paused && !showGameOver && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10,
+                            background: 'rgba(0, 0, 0, 0.5)',
+                        }}
+                    >
+                        <div
+                            style={{
+                                fontSize: '64px',
+                                color: '#0ff',
+                                fontWeight: 'bold',
+                                fontFamily: 'Orbitron Variable, sans-serif',
+                                textShadow: '0 0 16px #0ff, 0 0 32px #0088ff',
+                            }}
+                        >
+                            PAUSED
+                        </div>
+                    </div>
+                )}
                 {showGameOver && (
                     <div
                         style={{

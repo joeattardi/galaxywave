@@ -60,6 +60,14 @@ export default class MainScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.12, 0.12);
         this.cameras.main.setRoundPixels(true);
 
+        this.game.events.on('pause-toggled', (paused: boolean) => {
+            if (paused) {
+                this.scene.pause();
+            } else {
+                this.scene.resume();
+            }
+        });
+
         this.physics.add.overlap(
             this.weapons.bullets,
             this.spawner.group,
