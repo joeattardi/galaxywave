@@ -12,7 +12,8 @@ const audio = [
     { key: 'pickupCoin', path: 'assets/pickupCoin.wav' },
     { key: 'thrusterRumble', path: 'assets/thrusterRumble.wav' },
     { key: 'laserShoot', path: 'assets/laserShoot.wav' },
-    { key: 'backgroundMusic', path: 'assets/Nebula_Stalker.mp3' }
+    // { key: 'backgroundMusic', path: 'assets/Nebula_Stalker.mp3' }
+    { key: 'backgroundMusic', path: 'assets/bgm.mp3' }
 ] as const;
 
 export function loadAssets(scene: Phaser.Scene): void {
