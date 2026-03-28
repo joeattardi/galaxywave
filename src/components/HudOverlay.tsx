@@ -1,4 +1,5 @@
-import './HudOverlay.css';
+import clsx from 'clsx';
+import classes from './HudOverlay.module.css';
 
 interface HudOverlayProps {
     score: number;
@@ -11,25 +12,25 @@ export default function HudOverlay({ score, health, coins, gameOver }: HudOverla
     const healthPercent = Math.max(0, Math.min(100, health));
 
     return (
-        <div className="hud-overlay">
-            <span className="hud-item">SCORE {score}</span>
-            <div className="hud-item health-bar-container">
-                <span className="health-label">SHIELDS</span>
-                <div className="health-bar-track">
+        <div className={classes.hudOverlay}>
+            <span className={classes.hudItem}>Score {score}</span>
+            <div className={clsx(classes.hudItem, classes.healthBarContainer)}>
+                <span className={classes.healthLabel}>Shields</span>
+                <div className={classes.healthBarTrack}>
                     <div
-                        className="health-bar-fill"
+                        className={classes.healthBarFill}
                         style={{ width: `${healthPercent}%` }}
                     />
                     <div
-                        className="health-bar-glow"
+                        className={classes.healthBarGlow}
                         style={{ width: `${healthPercent}%` }}
                     />
                     {healthPercent < 30 && !gameOver && (
-                        <span className="critical-alert">CRITICAL</span>
+                        <span className={classes.criticalAlert}>Critical</span>
                     )}
                 </div>
             </div>
-            <span className="hud-item">COINS {coins}</span>
+            <span className={classes.hudItem}>Coins {coins}</span>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react';
-import './MainMenu.css';
+import classes from './MainMenu.module.css';
 
 interface MainMenuProps {
     onStartGame: () => void;
@@ -45,11 +45,11 @@ export default function MainMenu({ onStartGame }: MainMenuProps) {
     }, [onStartGame]);
 
     return (
-        <div className="main-menu">
-            <div className="menu-content">
-                <h1 className="menu-title">GALAXY WAVE</h1>
-                <p className="menu-subtitle">A space survival shooter</p>
-                <button ref={buttonRef} className="menu-button" onClick={handleStart}>
+        <div className={classes.mainMenu}>
+            <div className={classes.menuContent}>
+                <h1 className={classes.menuTitle}>GALAXY WAVE</h1>
+                <p className={classes.menuSubtitle}>A space survival shooter</p>
+                <button ref={buttonRef} className={classes.menuButton} onClick={handleStart}>
                     Start Game
                 </button>
             </div>
