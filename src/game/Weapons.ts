@@ -1,29 +1,36 @@
 import Phaser from 'phaser';
 import { Player } from './Player';
 
+export interface WeaponData {
+    id: string;
+    name: string;
+    fireRate: number;
+    fireDelay: number;
+    bulletSpeed: number;
+    damage: number;
+    maxDistance: number;
+    texture: string;
+    trailTexture: string;
+    tint: string;
+    sound: string;
+}
+
 export class Weapons {
     readonly bullets: Phaser.Physics.Arcade.Group;
     private lastFired = Infinity;
-    private readonly fireRate: number;
-    private readonly fireDelay: number;
-    private readonly maxDistance: number;
     private readonly trailEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
     constructor(
         private scene: Phaser.Scene,
         private player: Player,
-        { fireRate = 500, fireDelay = 1000, maxDistance = 1600 } = {}
+        private readonly definition: WeaponData
     ) {
-        this.fireRate = fireRate;
-        this.fireDelay = fireDelay;
-        this.maxDistance = maxDistance;
-
         this.bullets = this.scene.physics.add.group({
-            defaultKey: 'bullet',
+            defaultKey: definition.texture,
             maxSize: 50
         });
 
-        this.trailEmitter = this.scene.add.particles(0, 0, 'bulletGlow', {
+        this.trailEmitter = this.scene.add.particles(0, 0, definition.trailTexture, {
             speed: { min: 5, max: 20 },
             scale: { start: 0.6, end: 0 },
             alpha: { start: 0.5, end: 0 },
@@ -36,11 +43,11 @@ export class Weapons {
 
     update(time: number): void {
         if (this.lastFired === Infinity) {
-            this.lastFired = time + this.fireDelay;
+            this.lastFired = time + this.definition.fireDelay;
         }
         if (time > this.lastFired) {
             this.fire();
-            this.lastFired = time + this.fireRate;
+            this.lastFired = time + this.definition.fireRate;
         }
         this.cullDistant();
         this.emitTrails();
@@ -64,15 +71,15 @@ export class Weapons {
             bullet.setActive(true);
             bullet.setVisible(true);
             bullet.body.enable = true;
-            bullet.setTint(0x88ddff);
+            bullet.setTint(parseInt(this.definition.tint, 16));
             bullet.setBlendMode(Phaser.BlendModes.ADD);
+            bullet.setData('damage', this.definition.damage);
 
-            const bulletSpeed = 500;
-            const vx = Math.cos(this.player.rotation) * bulletSpeed;
-            const vy = Math.sin(this.player.rotation) * bulletSpeed;
+            const vx = Math.cos(this.player.rotation) * this.definition.bulletSpeed;
+            const vy = Math.sin(this.player.rotation) * this.definition.bulletSpeed;
 
             bullet.body.setVelocity(vx, vy);
-            this.scene.sound.play('laserShoot', { volume: 0.25});
+            this.scene.sound.play(this.definition.sound, { volume: 0.25 });
         }
     }
 
@@ -87,7 +94,7 @@ export class Weapons {
     private cullDistant(): void {
         const px = this.player.x;
         const py = this.player.y;
-        const bd2 = this.maxDistance * this.maxDistance;
+        const bd2 = this.definition.maxDistance * this.definition.maxDistance;
         this.bullets.getChildren().forEach((obj) => {
             const bullet = obj as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
             if (!bullet.active) return;

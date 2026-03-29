@@ -45,9 +45,10 @@ export class CombatResolver {
         b.body.enable = false;
         b.body.setVelocity(0, 0);
 
-        this.spawnDamageNumber(e.x, e.y - 24, 50);
+        const damage = (b.getData('damage') as number) ?? 50;
+        this.spawnDamageNumber(e.x, e.y - 24, damage);
         if (!e.definition.oneShot) {
-            e.health -= 50;
+            e.health -= damage;
             this.scene.sound.play('damage');
             if (e.health > 0) {
                 this.shieldHitEmitter.explode(6, b.x, b.y);

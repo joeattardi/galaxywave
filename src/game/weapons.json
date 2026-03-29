@@ -1,0 +1,15 @@
+[
+  {
+    "id": "laserBolt",
+    "name": "Laser Bolt",
+    "fireRate": 500,
+    "fireDelay": 1000,
+    "bulletSpeed": 500,
+    "damage": 50,
+    "maxDistance": 1600,
+    "texture": "bullet",
+    "trailTexture": "bulletGlow",
+    "tint": "88ddff",
+    "sound": "laserShoot"
+  }
+]

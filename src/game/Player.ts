@@ -2,18 +2,21 @@ import Phaser from 'phaser';
 import { ThrusterEffect } from './ThrusterEffect';
 import { RcsEffect } from './RcsEffect';
 import { ShipCommand } from './InputMapper';
+import { WeaponData } from './Weapons';
 
 const DEFAULT_MAX_SPEED = 220;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     declare body: Phaser.Physics.Arcade.Body;
     health: number;
+    readonly weapons: WeaponData[];
 
     private thruster: ThrusterEffect;
     private rcs: RcsEffect;
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, weapons: WeaponData[]) {
         super(scene, x, y, 'player');
+        this.weapons = weapons;
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
