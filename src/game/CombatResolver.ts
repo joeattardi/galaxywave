@@ -1,9 +1,11 @@
 import Phaser from 'phaser';
 import { Player } from './Player';
+import { Enemy } from './Enemy';
 import { CoinManager } from './CoinManager';
 
 export class CombatResolver {
     private readonly explosionEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+    private readonly shieldHitEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
     private score = 0;
 
     constructor(
@@ -19,6 +21,17 @@ export class CombatResolver {
             gravityY: 0,
             emitting: false
         });
+
+        this.shieldHitEmitter = this.scene.add.particles(0, 0, 'bulletGlow', {
+            speed: { min: 40, max: 120 },
+            scale: { start: 0.5, end: 0 },
+            alpha: { start: 0.8, end: 0 },
+            tint: [0x66ffff, 0x88ddff, 0xffffff],
+            lifespan: 300,
+            blendMode: Phaser.BlendModes.ADD,
+            gravityY: 0,
+            emitting: false
+        });
     }
 
     hitEnemy(
@@ -26,10 +39,20 @@ export class CombatResolver {
         enemy: Phaser.GameObjects.GameObject
     ): void {
         const b = bullet as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-        const e = enemy as Phaser.GameObjects.Sprite;
+        const e = enemy as Enemy;
         b.setActive(false);
         b.setVisible(false);
+        b.body.enable = false;
         b.body.setVelocity(0, 0);
+
+        e.health -= 50;
+        this.scene.sound.play('damage');
+        if (e.health > 0) {
+            this.shieldHitEmitter.explode(6, b.x, b.y);
+            e.setTintFill(0xffffff);
+            this.scene.time.delayedCall(80, () => e.clearTint());
+            return;
+        }
 
         this.explosionEmitter.explode(15, e.x, e.y);
         this.coinManager.spawn(e.x, e.y);
@@ -49,7 +72,7 @@ export class CombatResolver {
         this.explosionEmitter.explode(15, e.x, e.y);
         e.destroy();
 
-        this.scene.sound.play('playerDamage');
+        this.scene.sound.play('damage');
 
         this.scene.cameras.main.flash(200, 255, 0, 0);
         this.scene.cameras.main.shake(200, 0.01);

@@ -6,13 +6,12 @@ const images = [
 ] as const;
 
 const audio = [
-    { key: 'playerDamage', path: 'assets/playerDamage.wav' },
+    { key: 'damage', path: 'assets/damage.wav' },
     { key: 'playerDeath', path: 'assets/playerDeath.wav' },
     { key: 'enemyDestroyed', path: 'assets/enemyDestroyed.wav' },
     { key: 'pickupCoin', path: 'assets/pickupCoin.wav' },
     { key: 'thrusterRumble', path: 'assets/thrusterRumble.wav' },
     { key: 'laserShoot', path: 'assets/laserShoot.wav' },
-    // { key: 'backgroundMusic', path: 'assets/Nebula_Stalker.mp3' }
     { key: 'backgroundMusic', path: 'assets/bgm.mp3' }
 ] as const;
 

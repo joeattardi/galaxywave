@@ -63,6 +63,7 @@ export class Weapons {
         if (bullet) {
             bullet.setActive(true);
             bullet.setVisible(true);
+            bullet.body.enable = true;
             bullet.setTint(0x88ddff);
             bullet.setBlendMode(Phaser.BlendModes.ADD);
 

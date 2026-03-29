@@ -48,7 +48,6 @@ export default function MainMenu({ onStartGame }: MainMenuProps) {
         <div className={classes.mainMenu}>
             <div className={classes.menuContent}>
                 <h1 className={classes.menuTitle}>GALAXY WAVE</h1>
-                <p className={classes.menuSubtitle}>A space survival shooter</p>
                 <button ref={buttonRef} className={classes.menuButton} onClick={handleStart}>
                     Start Game
                 </button>

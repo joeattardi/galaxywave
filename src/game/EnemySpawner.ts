@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Player } from './Player';
+import { Enemy } from './Enemy';
 
 export class EnemySpawner {
     readonly group: Phaser.Physics.Arcade.Group;
@@ -53,12 +54,8 @@ export class EnemySpawner {
         const x = this.player.x + Math.cos(angle) * dist;
         const y = this.player.y + Math.sin(angle) * dist;
 
-        const enemy = this.group.create(
-            x,
-            y,
-            'enemy'
-        ) as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-        enemy.setCollideWorldBounds(false);
+        const enemy = new Enemy(this.scene, x, y);
+        this.group.add(enemy);
     }
 
     private cullDistant(): void {
