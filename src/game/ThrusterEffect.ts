@@ -48,7 +48,7 @@ export class ThrusterEffect {
 
         this.rumble = scene.sound.add('thrusterRumble', {
             loop: true,
-            volume: 2
+            volume: 0.8
         });
     }
 
