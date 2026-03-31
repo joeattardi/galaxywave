@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { Player } from './Player';
 import { EnemySpawner } from './EnemySpawner';
 
-type WaveState = 'incoming' | 'spawning' | 'waitingForClear' | 'cleared';
+type WaveState = 'incoming' | 'spawning' | 'waitingForClear' | 'waitingForStore' | 'cleared';
 
 export class WaveManager {
     private wave = 0;
@@ -12,13 +12,18 @@ export class WaveManager {
     private spawnTimer = 0;
     private readonly spawnInterval = 800;
     private readonly incomingDuration = 2500;
-    private readonly clearedDuration = 2500;
 
     constructor(
         private scene: Phaser.Scene,
         private player: Player,
         private spawner: EnemySpawner
-    ) {}
+    ) {
+        scene.game.events.on('store-dismissed', () => {
+            if (this.state === 'waitingForStore') {
+                this.startNextWave();
+            }
+        });
+    }
 
     start(): void {
         this.startNextWave();
@@ -52,11 +57,9 @@ export class WaveManager {
             }
         } else if (this.state === 'waitingForClear') {
             if (this.spawner.group.countActive(true) === 0) {
-                this.state = 'cleared';
+                this.state = 'waitingForStore';
+                this.scene.sound.play('storeOpen');
                 this.scene.game.events.emit('wave-cleared', this.wave);
-                this.scene.time.delayedCall(this.clearedDuration, () => {
-                    this.startNextWave();
-                });
             }
         }
     }

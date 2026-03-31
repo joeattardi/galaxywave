@@ -12,6 +12,7 @@ const audio = [
     { key: 'pickupCoin', path: 'assets/pickupCoin.wav' },
     { key: 'thrusterRumble', path: 'assets/thrusterRumble.wav' },
     { key: 'laserShoot', path: 'assets/laserShoot.wav' },
+    { key: 'storeOpen', path: 'assets/storeOpen.wav' },
     { key: 'backgroundMusic', path: 'assets/bgm.mp3' }
 ] as const;
 

@@ -35,3 +35,10 @@
 .resetButton:hover {
     background: #666;
 }
+
+.stats {
+    display: flex;
+    gap: 32px;
+    font-size: 22px;
+    color: #aaa;
+}

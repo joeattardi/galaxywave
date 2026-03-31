@@ -5,6 +5,7 @@ import HudOverlay from './HudOverlay';
 import PauseView from './PauseView';
 import GameContext from './GameContext';
 import GameOverView from './GameOverView';
+import StoreView from './StoreView';
 
 const waveBannerStyle: React.CSSProperties = {
     position: 'absolute',
@@ -30,13 +31,20 @@ export default function PhaserGame() {
     const containerRef = useRef<HTMLDivElement>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
     const waveMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Refs to capture current stats in event listeners without stale closures
+    const waveNumberRef = useRef(0);
+    const coinsRef = useRef(0);
+
     const [showGameOver, setShowGameOver] = useState(false);
+    const [showStore, setShowStore] = useState(false);
     const [paused, setPaused] = useState(false);
     const [score, setScore] = useState(0);
     const [health, setHealth] = useState(100);
     const [coins, setCoins] = useState(0);
     const [waveNumber, setWaveNumber] = useState(0);
+    const [clearedWave, setClearedWave] = useState(0);
     const [waveMessage, setWaveMessage] = useState<string | null>(null);
+    const [gameOverStats, setGameOverStats] = useState({ score: 0, wave: 0, coins: 0 });
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -45,14 +53,20 @@ export default function PhaserGame() {
         const game = new Phaser.Game(config);
         gameRef.current = game;
 
-        game.events.on('game-over', () => {
+        game.events.on('game-over', ({ score: finalScore }: { score: number }) => {
             setPaused(false);
+            setShowStore(false);
             setShowGameOver(true);
+            setGameOverStats({ score: finalScore, wave: waveNumberRef.current, coins: coinsRef.current });
         });
         game.events.on('score-changed', (value: number) => setScore(value));
         game.events.on('health-changed', (value: number) => setHealth(value));
-        game.events.on('coin-collected', (value: number) => setCoins(value));
+        game.events.on('coin-collected', (value: number) => {
+            coinsRef.current = value;
+            setCoins(value);
+        });
         game.events.on('wave-start', (wave: number) => {
+            waveNumberRef.current = wave;
             setWaveNumber(wave);
             if (waveMessageTimeoutRef.current) clearTimeout(waveMessageTimeoutRef.current);
             setWaveMessage(`Wave ${wave} incoming!`);
@@ -60,8 +74,10 @@ export default function PhaserGame() {
         });
         game.events.on('wave-cleared', (wave: number) => {
             if (waveMessageTimeoutRef.current) clearTimeout(waveMessageTimeoutRef.current);
-            setWaveMessage(`Wave ${wave} cleared!`);
-            waveMessageTimeoutRef.current = setTimeout(() => setWaveMessage(null), 2000);
+            setWaveMessage(null);
+            setClearedWave(wave);
+            setShowStore(true);
+            setTimeout(() => game.events.emit('pause-toggled', true), 500);
         });
 
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -84,16 +100,25 @@ export default function PhaserGame() {
         };
     }, []);
 
+    const dismissStore = () => {
+        setShowStore(false);
+        gameRef.current?.events.emit('pause-toggled', false);
+        gameRef.current?.events.emit('store-dismissed');
+    };
+
     const resetGame = () => {
         const game = gameRef.current;
         if (!game) return;
         setShowGameOver(false);
+        setShowStore(false);
         setPaused(false);
         setScore(0);
         setHealth(100);
         setCoins(0);
         setWaveNumber(0);
         setWaveMessage(null);
+        waveNumberRef.current = 0;
+        coinsRef.current = 0;
         if (waveMessageTimeoutRef.current) clearTimeout(waveMessageTimeoutRef.current);
         const scene = game.scene.getScene('MainScene');
         if (scene) {
@@ -111,10 +136,13 @@ export default function PhaserGame() {
     return (
         <GameContext.Provider value={contextValue}>
             <div id="game-wrapper">
-                <div ref={containerRef} id="game-container">
-                    {paused && !showGameOver && <PauseView />}
-                    {showGameOver && <GameOverView />}
-                    {waveMessage && !showGameOver && (
+                <div ref={containerRef} id="game-container" className={showStore ? 'hide-canvas' : undefined}>
+                    {paused && !showGameOver && !showStore && <PauseView />}
+                    {showStore && !showGameOver && (
+                        <StoreView wave={clearedWave} coins={coins} onContinue={dismissStore} />
+                    )}
+                    {showGameOver && <GameOverView stats={gameOverStats} />}
+                    {waveMessage && !showGameOver && !showStore && (
                         <div style={waveBannerStyle}>
                             <span style={waveBannerTextStyle}>{waveMessage}</span>
                         </div>

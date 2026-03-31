@@ -114,7 +114,7 @@ export class CombatResolver {
             this.scene.cameras.main.flash(500, 255, 255, 255);
 
             this.scene.sound.stopAll();
-            this.scene.game.events.emit('game-over');
+            this.scene.game.events.emit('game-over', { score: this.score });
 
             this.scene.sound.play('playerDeath');
         }

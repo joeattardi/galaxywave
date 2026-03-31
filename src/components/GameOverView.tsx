@@ -2,7 +2,11 @@ import { useEffect, useRef } from 'react';
 import classes from './GameOverView.module.css';
 import useGameContext from './useGameContext';
 
-export default function GameOverView() {
+interface Props {
+    stats: { score: number; wave: number; coins: number };
+}
+
+export default function GameOverView({ stats }: Props) {
     const { resetGame } = useGameContext();
     const ref = useRef<HTMLButtonElement>(null);
 
@@ -14,6 +18,11 @@ export default function GameOverView() {
         <div className={classes.gameOverOverlay}>
             <div className={classes.gameOverMessage}>
                 Game Over
+            </div>
+            <div className={classes.stats}>
+                <span>Wave {stats.wave}</span>
+                <span>Score {stats.score}</span>
+                <span>Coins {stats.coins}</span>
             </div>
             <button
                 className={classes.resetButton}

@@ -25,6 +25,7 @@ export default class MainScene extends Phaser.Scene {
     private coinManager!: CoinManager;
     private combat!: CombatResolver;
     private waveManager!: WaveManager;
+    private music!: Phaser.Sound.BaseSound;
 
     constructor() {
         super('MainScene');
@@ -39,7 +40,8 @@ export default class MainScene extends Phaser.Scene {
         this.starfield = new Starfield(this);
         this.starfield.setup();
 
-        this.sound.play('backgroundMusic', { loop: true, volume: 0.3 });
+        this.music = this.sound.add('backgroundMusic', { loop: true, volume: 0.3 });
+        this.music.play();
 
         this.physics.world.setBounds(-2e6, -2e6, 4e6, 4e6);
         this.physics.world.setBoundsCollision(false, false, false, false);
@@ -69,9 +71,12 @@ export default class MainScene extends Phaser.Scene {
 
         this.game.events.on('pause-toggled', (paused: boolean) => {
             if (paused) {
+                this.sound.pauseAll();
+                this.music.resume();
                 this.scene.pause();
             } else {
                 this.scene.resume();
+                this.sound.resumeAll();
             }
         });
 
