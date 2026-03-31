@@ -19,10 +19,10 @@ export class EnemySpawner {
         this.group = this.scene.physics.add.group();
     }
 
-    update(): void {
+    update(delta: number): void {
         this.group.getChildren().forEach((obj) => {
             const enemy = obj as Enemy;
-            this.scene.physics.moveToObject(enemy, this.player, enemy.definition.speed);
+            enemy.behavior.steer(enemy, this.player, this.scene, delta);
         });
         this.cullDistant();
     }

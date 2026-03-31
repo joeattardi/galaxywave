@@ -6,6 +6,7 @@
     "oneShot": true,
     "health": 50,
     "damage": 10,
-    "speed": 200
+    "speed": 200,
+    "behaviors": ["direct", "flank", "orbit"]
   }
 ]

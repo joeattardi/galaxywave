@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { createBehavior } from './behaviors/BehaviorFactory';
+import type { SteeringBehavior } from './behaviors/SteeringBehavior';
 
 export interface EnemyData {
     id: string;
@@ -8,6 +10,8 @@ export interface EnemyData {
     health: number;
     damage: number;
     speed: number;
+    /** Behavior keys to pick from at random on spawn. Defaults to ["direct"]. */
+    behaviors?: string[];
 }
 
 const BAR_WIDTH = 32;
@@ -17,6 +21,7 @@ const BAR_OFFSET_Y = -24;
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
     declare body: Phaser.Physics.Arcade.Body;
     readonly definition: EnemyData;
+    readonly behavior: SteeringBehavior;
 
     private _health: number;
     private healthBar: Phaser.GameObjects.Graphics | null;
@@ -39,6 +44,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this._health = definition.health;
         this.healthBar = definition.oneShot ? null : scene.add.graphics({ x, y });
         this.drawHealthBar();
+
+        const keys = definition.behaviors ?? ['direct'];
+        this.behavior = createBehavior(keys[Math.floor(Math.random() * keys.length)]);
     }
 
     preUpdate(time: number, delta: number): void {

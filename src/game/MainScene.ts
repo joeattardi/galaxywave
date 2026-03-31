@@ -119,7 +119,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.maybeRecenterWorld();
         this.weapons.update(time);
-        this.spawner.update();
+        this.spawner.update(delta);
         this.waveManager.update(delta);
         this.coinManager.updateMagnet();
         this.radar.update(
