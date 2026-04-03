@@ -2,6 +2,9 @@ import Phaser from 'phaser';
 import { Player } from './Player';
 import { Enemy, EnemyData } from './Enemy';
 
+const DEFAULT_CULL_DISTANCE = 3400;
+const DEFAULT_MAX_ENEMIES = 220;
+
 export class EnemySpawner {
     readonly group: Phaser.Physics.Arcade.Group;
     private readonly maxEnemies: number;
@@ -11,7 +14,7 @@ export class EnemySpawner {
         private scene: Phaser.Scene,
         private player: Player,
         private enemyDef: EnemyData,
-        { maxEnemies = 220, cullDistance = 3400 } = {}
+        { maxEnemies = DEFAULT_MAX_ENEMIES, cullDistance = DEFAULT_CULL_DISTANCE } = {}
     ) {
         this.maxEnemies = maxEnemies;
         this.cullDistance = cullDistance;

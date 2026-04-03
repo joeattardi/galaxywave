@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 
+const THRUSTER_SHIP_OFFSET = 14;
+
 function setEmitterAngle(
     emitter: Phaser.GameObjects.Particles.ParticleEmitter,
     min: number,
@@ -65,9 +67,9 @@ export class ThrusterEffect {
         const mag = Math.sqrt(magSq);
         const nx = acceleration.x / mag;
         const ny = acceleration.y / mag;
-        const offset = 14;
-        const px = playerX - nx * offset;
-        const py = playerY - ny * offset;
+
+        const px = playerX - nx * THRUSTER_SHIP_OFFSET;
+        const py = playerY - ny * THRUSTER_SHIP_OFFSET;
 
         const deg = Phaser.Math.RadToDeg(Math.atan2(-acceleration.y, -acceleration.x));
 
