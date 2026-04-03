@@ -1,15 +1,16 @@
 import Phaser from 'phaser';
 import { Player } from './Player';
+import { GameState } from './GameState';
 
 export class CoinManager {
     readonly group: Phaser.Physics.Arcade.Group;
     private readonly magnetRange: number;
     private readonly baseMagnetSpeed: number;
-    private coinCount = 0;
 
     constructor(
         private scene: Phaser.Scene,
         private player: Player,
+        private state: GameState,
         { magnetRange = 100, baseMagnetSpeed = 100 } = {}
     ) {
         this.magnetRange = magnetRange;
@@ -26,8 +27,7 @@ export class CoinManager {
         coin: Phaser.GameObjects.GameObject
     ): void {
         coin.destroy();
-        this.coinCount += 1;
-        this.scene.game.events.emit('coin-collected', this.coinCount);
+        this.state.collectCoin();
         this.scene.sound.play('pickupCoin');
     }
 

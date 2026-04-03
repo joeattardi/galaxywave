@@ -9,6 +9,7 @@ import { Weapons } from './Weapons';
 import { CoinManager } from './CoinManager';
 import { CombatResolver } from './CombatResolver';
 import { WaveManager } from './WaveManager';
+import { GameState } from './GameState';
 import { loadAssets } from './AssetManifest';
 import enemyDefs from './enemies.json';
 import weaponDefs from './weapons.json';
@@ -24,6 +25,7 @@ export default class MainScene extends Phaser.Scene {
     private weapons!: Weapons;
     private coinManager!: CoinManager;
     private combat!: CombatResolver;
+    private state!: GameState;
     private waveManager!: WaveManager;
     private music!: Phaser.Sound.BaseSound;
 
@@ -52,8 +54,9 @@ export default class MainScene extends Phaser.Scene {
         const drone = enemyDefs.find(e => e.id === 'drone')!;
         this.spawner = new EnemySpawner(this, this.player, drone);
 
-        this.coinManager = new CoinManager(this, this.player);
-        this.combat = new CombatResolver(this, this.player, this.coinManager);
+        this.state = new GameState(this.game.events);
+        this.coinManager = new CoinManager(this, this.player, this.state);
+        this.combat = new CombatResolver(this, this.player, this.coinManager, this.state);
         this.waveManager = new WaveManager(this, this.player, this.spawner);
         this.waveManager.start();
 
@@ -115,7 +118,7 @@ export default class MainScene extends Phaser.Scene {
     update(time: number, delta: number): void {
         this.starfield.update(time, delta);
 
-        if (this.player.health <= 0) {
+        if (this.state.health <= 0) {
             return;
         }
 

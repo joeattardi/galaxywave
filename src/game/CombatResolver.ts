@@ -2,16 +2,17 @@ import Phaser from 'phaser';
 import { Player } from './Player';
 import { Enemy } from './Enemy';
 import { CoinManager } from './CoinManager';
+import { GameState } from './GameState';
 
 export class CombatResolver {
     private readonly explosionEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
     private readonly shieldHitEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
-    private score = 0;
 
     constructor(
         private scene: Phaser.Scene,
         private player: Player,
-        private coinManager: CoinManager
+        private coinManager: CoinManager,
+        private state: GameState
     ) {
         this.explosionEmitter = this.scene.add.particles(0, 0, 'bullet', {
             speed: { min: 50, max: 150 },
@@ -62,8 +63,8 @@ export class CombatResolver {
         this.coinManager.spawn(e.x, e.y);
         e.destroy();
 
-        this.score += 10;
-        this.scene.game.events.emit('score-changed', this.score);
+        this.state.addScore(10);
+        this.state.recordKill();
         this.scene.sound.play('enemyDestroyed');
         this.scene.cameras.main.flash(80, 200, 200, 200);
     }
@@ -99,10 +100,9 @@ export class CombatResolver {
         this.scene.cameras.main.flash(200, 255, 0, 0);
         this.scene.cameras.main.shake(200, 0.01);
 
-        this.player.health -= e.definition.damage;
-        this.scene.game.events.emit('health-changed', this.player.health);
+        this.state.health -= e.definition.damage;
 
-        if (this.player.health <= 0) {
+        if (this.state.health <= 0) {
             this.player.stopEffects();
             this.scene.physics.pause();
             this.player.setTint(0xff0000);
@@ -114,7 +114,7 @@ export class CombatResolver {
             this.scene.cameras.main.flash(500, 255, 255, 255);
 
             this.scene.sound.stopAll();
-            this.scene.game.events.emit('game-over', { score: this.score });
+            this.state.emitGameOver();
 
             this.scene.sound.play('playerDeath');
         }

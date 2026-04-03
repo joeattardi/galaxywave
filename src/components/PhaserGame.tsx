@@ -53,11 +53,11 @@ export default function PhaserGame() {
         const game = new Phaser.Game(config);
         gameRef.current = game;
 
-        game.events.on('game-over', ({ score: finalScore }: { score: number }) => {
+        game.events.on('game-over', ({ score: finalScore, coins: finalCoins }: { score: number; coins: number; enemiesKilled: number }) => {
             setPaused(false);
             setShowStore(false);
             setShowGameOver(true);
-            setGameOverStats({ score: finalScore, wave: waveNumberRef.current, coins: coinsRef.current });
+            setGameOverStats({ score: finalScore, wave: waveNumberRef.current, coins: finalCoins });
         });
         game.events.on('score-changed', (value: number) => setScore(value));
         game.events.on('health-changed', (value: number) => setHealth(value));
