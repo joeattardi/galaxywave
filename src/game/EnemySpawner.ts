@@ -9,17 +9,42 @@ export class EnemySpawner {
     readonly group: Phaser.Physics.Arcade.Group;
     private readonly maxEnemies: number;
     private readonly cullDistance: number;
+    private readonly baseEnemyDef: EnemyData;
+    private scaledEnemyDef: EnemyData;
 
     constructor(
         private scene: Phaser.Scene,
         private player: Player,
-        private enemyDef: EnemyData,
+        enemyDef: EnemyData,
         { maxEnemies = DEFAULT_MAX_ENEMIES, cullDistance = DEFAULT_CULL_DISTANCE } = {}
     ) {
         this.maxEnemies = maxEnemies;
         this.cullDistance = cullDistance;
+        this.baseEnemyDef = enemyDef;
+        this.scaledEnemyDef = { ...enemyDef };
 
         this.group = this.scene.physics.add.group();
+    }
+
+    /** Scale enemy stats based on wave number. */
+    setWaveScaling(wave: number): void {
+        // Flat early, ramps after wave 5
+        const ramp = Math.max(0, wave - 5);
+        // Speed: +3% per wave past 5 (wave 10 = +15%, wave 15 = +30%)
+        const speedMult = 1 + ramp * 0.03;
+        // Health: +5% per wave past 5 (wave 10 = +25%, wave 15 = +50%)
+        const healthMult = 1 + ramp * 0.05;
+        // Damage: +3% per wave past 5
+        const damageMult = 1 + ramp * 0.03;
+
+        this.scaledEnemyDef = {
+            ...this.baseEnemyDef,
+            speed: Math.round(this.baseEnemyDef.speed * speedMult),
+            health: Math.round(this.baseEnemyDef.health * healthMult),
+            damage: Math.round(this.baseEnemyDef.damage * damageMult),
+            // After wave 8, enemies are no longer one-shot
+            oneShot: wave <= 8 ? this.baseEnemyDef.oneShot : false,
+        };
     }
 
     update(delta: number): void {
@@ -50,7 +75,7 @@ export class EnemySpawner {
         const x = this.player.x + Math.cos(angle) * dist;
         const y = this.player.y + Math.sin(angle) * dist;
 
-        const enemy = new Enemy(this.scene, x, y, this.enemyDef);
+        const enemy = new Enemy(this.scene, x, y, this.scaledEnemyDef);
         this.group.add(enemy);
 
         // Warp-in flash effect
