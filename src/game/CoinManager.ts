@@ -6,6 +6,7 @@ export class CoinManager {
     readonly group: Phaser.Physics.Arcade.Group;
     private readonly magnetRange: number;
     private readonly baseMagnetSpeed: number;
+    private readonly sparkleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
     constructor(
         private scene: Phaser.Scene,
@@ -16,6 +17,16 @@ export class CoinManager {
         this.magnetRange = magnetRange;
         this.baseMagnetSpeed = baseMagnetSpeed;
         this.group = this.scene.physics.add.group();
+
+        this.sparkleEmitter = this.scene.add.particles(0, 0, 'coinSparkle', {
+            speed: { min: 40, max: 120 },
+            scale: { start: 0.8, end: 0 },
+            alpha: { start: 1, end: 0 },
+            tint: [0xffff44, 0xffffaa, 0xffffff],
+            lifespan: 350,
+            blendMode: Phaser.BlendModes.ADD,
+            emitting: false
+        });
     }
 
     spawn(x: number, y: number): void {
@@ -26,6 +37,8 @@ export class CoinManager {
         _player: Phaser.GameObjects.GameObject,
         coin: Phaser.GameObjects.GameObject
     ): void {
+        const c = coin as Phaser.GameObjects.Sprite;
+        this.sparkleEmitter.explode(8, c.x, c.y);
         coin.destroy();
         this.state.collectCoin();
         this.scene.sound.play('pickupCoin');

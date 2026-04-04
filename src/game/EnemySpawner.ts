@@ -52,6 +52,20 @@ export class EnemySpawner {
 
         const enemy = new Enemy(this.scene, x, y, this.enemyDef);
         this.group.add(enemy);
+
+        // Warp-in flash effect
+        const flash = this.scene.add.image(x, y, 'warpFlash')
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setAlpha(0.9)
+            .setScale(0.3);
+        this.scene.tweens.add({
+            targets: flash,
+            scale: 2.5,
+            alpha: 0,
+            duration: 350,
+            ease: 'Cubic.Out',
+            onComplete: () => flash.destroy(),
+        });
     }
 
     private cullDistant(): void {
